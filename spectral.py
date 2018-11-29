@@ -3,7 +3,7 @@ import scipy
 from scipy.cluster import vq as vq
 from scipy.sparse import csgraph as cs
 
-path = "ca-GrQc.txt"
+path = "data/ca-GrQc.txt"
 
 fh=open(path, 'rb')
 G=nx.read_edgelist(fh)
