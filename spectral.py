@@ -5,7 +5,7 @@ from scipy.sparse import csgraph as cs
 import matplotlib.pyplot as plt
 import numpy as np
 
-path = "data/ca-GrQc.txt"
+path = "data/part2/Oregon-1.txt"
 
 fh=open(path, 'rb')
 
@@ -23,8 +23,9 @@ num_nodes = len(G.nodes())
 L = nx.normalized_laplacian_matrix(G)
 print(L.shape)
 w, v = scipy.sparse.linalg.eigsh(L, which="SM")
-fiedler = v[:,1]
-_, labels = vq.kmeans2(fiedler,k)
+eigM = v[:,:(k-1)]
+print(eigM)
+_, labels = vq.kmeans2(eigM,k)
 print(labels)
 print(len(labels))
 
