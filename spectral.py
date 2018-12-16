@@ -7,40 +7,37 @@ import numpy as np
 
 path = "data/part2/Oregon-1.txt"
 
-fh=open(path, 'rb')
 
-# Read the header
-header = fh.readline()
-headers = header.split(' ')
-name = headers[1]
-verticesn = int(headers[2])
-edgesn = int(headers[3])
-k = int(headers[4])
+def read_header(path):
+	fh = open(path, 'rb')
+	header = fh.readline()
+	headers = header.split(' ')
+	name = headers[1]
+	verticesn = int(headers[2])
+	edgesn = int(headers[3])
+	if len(headers) == 4:
+		k = 2
+	else:
+		k = int(headers[4])
+	fh.close()
+	return name, verticesn, edgesn, k
 
-G=nx.read_edgelist(fh)
-fh.close()
-num_nodes = len(G.nodes())
-L = nx.normalized_laplacian_matrix(G)
-print(L.shape)
-w, v = scipy.sparse.linalg.eigsh(L, which="SM")
-eigM = v[:,:(k-1)]
-print(eigM)
-_, labels = vq.kmeans2(eigM,k)
-print(labels)
-print(len(labels))
+def read_file_to_graph(path):
+	fh = open(path, 'rb')
+	G = nx.read_edgelist(fh)
+	fh.close()
+	return G
 
-#figure = plt.figure()
-#plt.plot(fiedler)
-#plt.plot(np.sort(fiedler))
-#plt.show()
-#print(len(w))
-#print(w)
-#white = vq.whiten(v)
-#means = vq.kmeans2(white, 2)
-#print(len(G.nodes()))
-#print(len(G.edges()))
-#print (v[:,0])
+def spectral_algorithm(graph):
+	L = nx.normalized_laplacian_matrix(G)
+	w, v = scipy.sparse.linalg.eigsh(L, which="SM")
+	eigM = v[:,:(k-1)]
+	_, labels = vq.kmeans2(eigM,k)
+	return labels
 
+G = read_file_to_graph(path)
+name, n_nodes, n_edges, k = read_header(path)
+labels = spectral_algorithm(G)
 nx.draw(G, node_size=50, node_color=labels, edge_color="red")   #pos=nx.spring_layout(G, k=0.05, iterations=20)
 plt.savefig("graph.pdf")
-#plt.show()
+
