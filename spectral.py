@@ -9,12 +9,12 @@ import os
 from utils import objective_function
 from sklearn.cluster import KMeans
 
-folder = "data/test/"
+folder = "data/part1/"
 path = "data/part1/ca-AstroPh.txt"
 
 
 def read_header(path):
-	fh = open(path, 'rb')	
+	fh = open(path, 'r')
 	header = fh.readline()
 	headers = header.split(' ')
 	name = headers[1]
@@ -47,7 +47,6 @@ def spectral_algorithm_normalized(graph):
 	w, v = scipy.sparse.linalg.eigsh(L, which="SM")
 	if k == 2:
 		eigM = v[:,1]
-		
 		labels = [0 if i<0 else 1 for i in eigM]
 	else:
 		objective = 1000000000
@@ -56,36 +55,25 @@ def spectral_algorithm_normalized(graph):
 		for i in range(5):
 			_, labels = vq.kmeans2(eigM,k)
 			#kmeans = KMeans(n_clusters=k).fit(eigM)
-			#labels = kmeans.labels_	
+			#labels = kmeans.labels_
 			obj = objective_function(G,labels)
 			print(i, obj)
 			if obj<objective:
 				objective = obj
 				best_labels = labels
 		labels = best_labels
-		
 	return labels
 
-'''
-G = nx.karate_club_graph()
-k = 2
-labels = spectral_algorithm_normalized(G)
-print(list(G.nodes()))
-print(labels)
-print("Objective: ",objective_function(G, labels))
-print("Cluster sizes: ", Counter(labels))
-print(list(G.edges()))
-nx.draw(G, node_size=600, node_color=labels, with_labels=True, edge_color="red")
-plt.savefig("Karate.pdf")
-'''
 files = os.listdir(folder)
 for file in files:
 	G = read_file_to_graph(folder+file)
 	nodes = list(G.nodes())
+	print(len(nodes))
 	name, n_nodes, n_edges, k = read_header(folder+file)
-	print(file)
+	print(file, k)
 	labels = spectral_algorithm_normalized(G)
 	print("Cluster sizes: ", Counter(labels))
+	print("Amount of clusters: ", len(set(labels)))
 	file = open("clusters_"+file, "w")
 	file.write("# "+name+" "+str(n_nodes)+" "+str(n_edges)+" "+str(k)+"\n")
 	for i in range(n_nodes):
@@ -96,4 +84,16 @@ for file in files:
 	#plt.savefig(file[-4]+".pdf")
 
 
-
+def karate():
+	'''
+	G = nx.karate_club_graph()
+	k = 2
+	labels = spectral_algorithm_normalized(G)
+	print(list(G.nodes()))
+	print(labels)
+	print("Objective: ",objective_function(G, labels))
+	print("Cluster sizes: ", Counter(labels))
+	print(list(G.edges()))
+	nx.draw(G, node_size=600, node_color=labels, with_labels=True, edge_color="red")
+	plt.savefig("Karate.pdf")
+	'''
